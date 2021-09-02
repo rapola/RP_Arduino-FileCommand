@@ -30,10 +30,10 @@ FileCommand::FileCommand()
   : commandList(NULL),
     commandCount(0),
     defaultHandler(NULL),
-    term('\n'),           // default terminator for commands, newline character
+    term('\n'),           	// default terminator for commands, newline character
     last(NULL)
 {
-  strcpy(delim, " "); // strtok_r needs a null-terminated string
+  strcpy(delim, " "); 		// strtok_r needs a null-terminated string
   clearBuffer();
 }
 
@@ -72,18 +72,18 @@ void FileCommand::setDefaultHandler(void (*function)(const char *)) {
  */
 void FileCommand::readSerial() {
   while (Serial.available() > 0) {
-    char inChar = Serial.read();   // Read single available character, there may be more waiting
+    char inChar = Serial.read();   	// Read single available character, there may be more waiting
     #ifdef FILECOMMAND_DEBUG
-      Serial.print(inChar);   // Echo back to serial stream
+      Serial.print(inChar);   		// Echo back to serial stream
     #endif
 
-    if (inChar == term) {     // Check for the terminator (default '\r') meaning end of command
+    if (inChar == term) {     		// Check for the terminator (default '\r') meaning end of command
       #ifdef FILECOMMAND_DEBUG
         Serial.print("Received: ");
         Serial.println(buffer);
       #endif
 
-      char *command = strtok_r(buffer, delim, &last);   // Search for command at start of buffer
+      char *command = strtok_r(buffer, delim, &last);   	// Search for command at start of buffer
       if (command != NULL) {
         boolean matched = false;
         for (int i = 0; i < commandCount; i++) {
@@ -114,10 +114,10 @@ void FileCommand::readSerial() {
       }
       clearBuffer();
     }
-    else if (isprint(inChar)) {     // Only printable characters into the buffer
+    else if (isprint(inChar)) {     		// Only printable characters into the buffer
       if (bufPos < FILECOMMAND_BUFFER) {
-        buffer[bufPos++] = inChar;  // Put character into buffer
-        buffer[bufPos] = '\0';      // Null terminate
+        buffer[bufPos++] = inChar;  		// Put character into buffer
+        buffer[bufPos] = '\0';      		// Null terminate
       } else {
         #ifdef FILECOMMAND_DEBUG
           Serial.println("Line buffer is full - increase FILECOMMAND_BUFFER");
