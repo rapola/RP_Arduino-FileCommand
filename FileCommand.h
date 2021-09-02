@@ -21,8 +21,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef SerialCommand_h
-#define SerialCommand_h
+ 
+#ifndef FileCommand_h
+#define FileCommand_h
 
 #if defined(WIRING) && WIRING >= 100
   #include <Wiring.h>
