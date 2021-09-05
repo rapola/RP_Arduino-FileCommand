@@ -70,59 +70,57 @@ void FileCommand::setDefaultHandler(void (*function)(const char *)) {
  * When the terminator character (default '\n') is seen, it starts parsing the
  * buffer for a prefix command, and calls handlers setup by addCommand() member
  */
-void FileCommand::readSerial() {
-  while (Serial.available() > 0) {
-    char inChar = Serial.read();   	// Read single available character, there may be more waiting
+void FileCommand::parse(char inChar) {
+  //char inChar = Serial.read();   	// Read single available character, there may be more waiting
+  #ifdef FILECOMMAND_DEBUG
+    Serial.print(inChar);   		// Echo back to serial stream
+  #endif
+
+  if (inChar == term) {     		// Check for the terminator (default '\r') meaning end of command
     #ifdef FILECOMMAND_DEBUG
-      Serial.print(inChar);   		// Echo back to serial stream
+      Serial.print("Received: ");
+      Serial.println(buffer);
     #endif
 
-    if (inChar == term) {     		// Check for the terminator (default '\r') meaning end of command
-      #ifdef FILECOMMAND_DEBUG
-        Serial.print("Received: ");
-        Serial.println(buffer);
-      #endif
+    char *command = strtok_r(buffer, delim, &last);   	// Search for command at start of buffer
+    if (command != NULL) {
+      boolean matched = false;
+      for (int i = 0; i < commandCount; i++) {
+        #ifdef FILECOMMAND_DEBUG
+          Serial.print("Comparing [");
+          Serial.print(command);
+          Serial.print("] to [");
+          Serial.print(commandList[i].command);
+          Serial.println("]");
+        #endif
 
-      char *command = strtok_r(buffer, delim, &last);   	// Search for command at start of buffer
-      if (command != NULL) {
-        boolean matched = false;
-        for (int i = 0; i < commandCount; i++) {
+        // Compare the found command against the list of known commands for a match
+        if (strncmp(command, commandList[i].command, FILECOMMAND_MAXCOMMANDLENGTH) == 0) {
           #ifdef FILECOMMAND_DEBUG
-            Serial.print("Comparing [");
-            Serial.print(command);
-            Serial.print("] to [");
-            Serial.print(commandList[i].command);
-            Serial.println("]");
+            Serial.print("Matched Command: ");
+            Serial.println(command);
           #endif
 
-          // Compare the found command against the list of known commands for a match
-          if (strncmp(command, commandList[i].command, FILECOMMAND_MAXCOMMANDLENGTH) == 0) {
-            #ifdef FILECOMMAND_DEBUG
-              Serial.print("Matched Command: ");
-              Serial.println(command);
-            #endif
-
-            // Execute the stored handler function for the command
-            (*commandList[i].function)();
-            matched = true;
-            break;
-          }
-        }
-        if (!matched && (defaultHandler != NULL)) {
-          (*defaultHandler)(command);
+          // Execute the stored handler function for the command
+          (*commandList[i].function)();
+          matched = true;
+          break;
         }
       }
-      clearBuffer();
+      if (!matched && (defaultHandler != NULL)) {
+        (*defaultHandler)(command);
+      }
     }
-    else if (isprint(inChar)) {     		// Only printable characters into the buffer
-      if (bufPos < FILECOMMAND_BUFFER) {
-        buffer[bufPos++] = inChar;  		// Put character into buffer
-        buffer[bufPos] = '\0';      		// Null terminate
-      } else {
-        #ifdef FILECOMMAND_DEBUG
-          Serial.println("Line buffer is full - increase FILECOMMAND_BUFFER");
-        #endif
-      }
+    clearBuffer();
+  }
+  else if (isprint(inChar)) {     		// Only printable characters into the buffer
+    if (bufPos < FILECOMMAND_BUFFER) {
+      buffer[bufPos++] = inChar;  		// Put character into buffer
+      buffer[bufPos] = '\0';      		// Null terminate
+    } else {
+      #ifdef FILECOMMAND_DEBUG
+        Serial.println("Line buffer is full - increase FILECOMMAND_BUFFER");
+      #endif
     }
   }
 }
