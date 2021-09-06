@@ -1,19 +1,44 @@
 
 #include "src/FileCommand.h"
+#include "SPIFFS.h"
+
 
 FileCommand fcmd;
 
 void setup() {
 
-fcmd.addCommand("HELLO", sayHello);        // Echos the string argument back
-fcmd.setDefaultHandler(unrecognized);      // Handler for command that isn't matched
+  Serial.begin(115200);
+
+  fcmd.addCommand("HELLO", sayHello);         // Echos the string argument back
+  fcmd.addCommand("pCom", pCommand);          //converts arguments to integer
+  fcmd.setDefaultHandler(unrecognized);       // Handler for command that isn't matched
+
+//initialise file system
+  if(!SPIFFS.begin(true)){
+    Serial.println("An Error has occurred while mounting SPIFFS");
+    return;
+  }
+
+//open file and parse
+  File file = SPIFFS.open("/cfg.txt");
+  if(!file){
+    Serial.println("Failed opening /cft.txt");
+    return;
+  }
+  Serial.print("Start parsing");
+  Serial.println();
+  Serial.println();
+  while(file.available()){
+    fcmd.parse(file.read());
+  }
+  file.close();
+
 
 
 }
 
 void loop() {
-  char a = 'a';
-  fcmd.parse(a);
+
 
 }
 
@@ -30,7 +55,36 @@ void sayHello() {
   }
 }
 
+void pCommand() {
+  int aNumber;
+  char *arg;
+
+  Serial.println("processing command");
+  arg = fcmd.next();
+  if (arg != NULL) {
+    aNumber = atoi(arg);    // Converts a char string to an integer
+    Serial.print("First argument was: ");
+    Serial.println(aNumber);
+  }
+  else {
+    Serial.println("No arguments");
+  }
+
+  arg = fcmd.next();
+  if (arg != NULL) {
+    aNumber = atol(arg);
+    Serial.print("Second argument was: ");
+    Serial.println(aNumber);
+  }
+  else {
+    Serial.println("No second argument");
+  }
+}
+
+
+
 // This gets set as the default handler, and gets called when no other command matches.
 void unrecognized(const char *command) {
-  Serial.println("What?");
+  Serial.print("unrecognized parameters: ");
+  Serial.println(command);
 }
