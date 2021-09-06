@@ -9,9 +9,9 @@ void setup() {
 
   Serial.begin(115200);
 
-  fcmd.addCommand("HELLO", sayHello);         // Echos the string argument back
+  fcmd.addCommand("HELLO", sayHello);         //echos the string argument back
   fcmd.addCommand("pCom", pCommand);          //converts arguments to integer
-  fcmd.setDefaultHandler(unrecognized);       // Handler for command that isn't matched
+  fcmd.setDefaultHandler(unrecognized);       //handler for command that isn't matched
 
 //initialise file system
   if(!SPIFFS.begin(true)){
@@ -45,8 +45,8 @@ void loop() {
 
 void sayHello() {
   char *arg;
-  arg = fcmd.next();    // Get the next argument from the SerialCommand object buffer
-  if (arg != NULL) {    // As long as it existed, take it
+  arg = fcmd.next();                        //get the next argument from the SerialCommand object buffer
+  if (arg != NULL) {                        //as long as it existed, take it
     Serial.print("Hello ");
     Serial.println(arg);
   }
@@ -62,7 +62,7 @@ void pCommand() {
   Serial.println("processing command");
   arg = fcmd.next();
   if (arg != NULL) {
-    aNumber = atoi(arg);    // Converts a char string to an integer
+    aNumber = atoi(arg);                    //converts a char string to an integer
     Serial.print("First argument was: ");
     Serial.println(aNumber);
   }
@@ -86,5 +86,5 @@ void pCommand() {
 // This gets set as the default handler, and gets called when no other command matches.
 void unrecognized(const char *command) {
   Serial.print("unrecognized parameters: ");
-  Serial.println(command);
+  Serial.println(command);                    //print which command is meant
 }
