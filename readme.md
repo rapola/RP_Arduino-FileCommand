@@ -8,3 +8,5 @@ The original version of this library was written by [Steven Cogswell](http://hus
 
 
 This is a totaly modified version.
+
+:slightly_smiling_face: tested with esp32
