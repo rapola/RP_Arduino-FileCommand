@@ -1,5 +1,5 @@
-FileCommand
-=============
+## RP_Arduino-FileCommand
+- - - -
 An Arduino library parse commands from a .txt file. 
 
 Inspired from [kroimon](https://github.com/kroimon/Arduino-SerialCommand)
@@ -9,4 +9,6 @@ The original version of this library was written by [Steven Cogswell](http://hus
 
 This is a totaly modified version.
 
-:slightly_smiling_face: tested with esp32
+Tested with esp32
+
+:point_right: After uploading the code, also upload the .txt-file from folder "data" to the SPIFFS of the ESP32
